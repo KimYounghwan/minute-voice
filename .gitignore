@@ -1,0 +1,13 @@
+.gradle/
+**/build/
+local.properties
+*.iml
+.DS_Store
+
+.signing/
+release-signing.properties
+dist/
+*.jks
+*.keystore
+.env
+작업중.md

@@ -1,0 +1,36 @@
+plugins { id 'com.android.application' }
+def signingFile = rootProject.file('release-signing.properties')
+def signingProperties = new Properties()
+if (signingFile.exists()) signingFile.withInputStream { signingProperties.load(it) }
+android {
+    namespace 'kr.co.minutevoice'
+    compileSdk 36
+    defaultConfig { applicationId 'kr.co.minutevoice'; minSdk 26; targetSdk 36; versionCode 34; versionName '1.16.0'; testInstrumentationRunner 'kr.co.minutevoice.MultiAlarmTestRunner' }
+    signingConfigs {
+        release {
+            if (signingFile.exists()) {
+                storeFile rootProject.file(signingProperties['storeFile'])
+                storePassword signingProperties['storePassword']
+                keyAlias signingProperties['keyAlias']
+                keyPassword signingProperties['keyPassword']
+            }
+        }
+    }
+    buildTypes { release { signingConfig signingConfigs.release } }
+    buildFeatures { buildConfig true }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}
+
+tasks.register('exportReleaseApk', Copy) {
+    dependsOn 'assembleRelease'
+    from layout.buildDirectory.file('outputs/apk/release/app-release.apk')
+    into rootProject.file('dist')
+    rename { "MinuteVoice_v${android.defaultConfig.versionName}.apk" }
+}
+
+tasks.register('exportReleaseBundle', Copy) {
+    dependsOn 'bundleRelease'
+    from layout.buildDirectory.file('outputs/bundle/release/app-release.aab')
+    into rootProject.file('dist')
+    rename { "MinuteVoice_v${android.defaultConfig.versionName}.aab" }
+}
